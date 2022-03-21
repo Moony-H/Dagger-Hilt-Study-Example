@@ -91,6 +91,8 @@ Container(상자)를 생성합니다.
 
 Container는 이 어노테이션이 사용한 Android class(Activity, Fragment 등)의 생명주기를 따릅니다.
 
+https://github.com/Moony-H/Dagger-Hilt-Study-Example/blob/master/app/src/main/java/com/example/android/hilt/ui/LogsFragment.kt
+
 ```kotlin
 @AndroidEntryPoint
 class LogsFragment : Fragment() {
@@ -223,6 +225,9 @@ object DatabaseModule {
 따라서 이 함수의 반환 타입은 반드시 Injection 되는 Field와 같아야 합니다.
 
 build 패턴을 사용하는 Room, Retrofit에 많이 사용합니다.
+
+https://github.com/Moony-H/Dagger-Hilt-Study-Example/blob/master/app/src/main/java/com/example/android/hilt/di/DataBaseModule.kt
+
 
 ```kotlin
 /**
