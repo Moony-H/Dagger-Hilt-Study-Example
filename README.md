@@ -318,4 +318,6 @@ abstract class NavigationModule {
 <br/>
 <br/>
 
-앱 실행 화면:
+앱 실행 화면:  
+
+![hilt_example](https://user-images.githubusercontent.com/53536205/159365038-21089c6e-df93-40c8-9f9d-b28168ffa575.gif)
