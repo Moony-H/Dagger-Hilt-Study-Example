@@ -28,7 +28,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.hilt.LogApplication
 import com.example.android.hilt.R
 import com.example.android.hilt.data.Log
+import com.example.android.hilt.data.LoggerDataSource
 import com.example.android.hilt.data.LoggerLocalDataSource
+import com.example.android.hilt.di.DatabaseLogger
 import com.example.android.hilt.util.DateFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -50,7 +52,8 @@ class LogsFragment : Fragment() {
      */
 
     //Instance 주입은 onAttach 에서 하게 된다.
-    @Inject lateinit var logger: LoggerLocalDataSource
+    @DatabaseLogger
+    @Inject lateinit var logger: LoggerDataSource
     @Inject lateinit var dateFormatter: DateFormatter
 
     private lateinit var recyclerView: RecyclerView
