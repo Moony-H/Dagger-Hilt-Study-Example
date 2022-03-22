@@ -13,7 +13,9 @@
 
 학습 구성과 흐름은 https://developer.android.com/codelabs/android-hilt#0 에서 확인하실 수 있습니다.
 
-이 repository는 https://github.com/googlecodelabs/android-hilt 의 프로젝트에 Hilt를 적용시켜 Refactoring한 repository입니다.
+이 repository는 구글의 Service Locator 패턴 예시의 프로젝트에 Hilt를 적용시켜 Refactoring한 repository입니다.
+
+따라서 원본 파일은 이곳에서 볼 수 있습니다. https://github.com/googlecodelabs/android-hilt
 
 <br/>
 
@@ -27,11 +29,11 @@
 
 <br/>
 
-container는 Component가 들어가는 "상자"라고 이해하면 쉽습니다.
+container는 Component가 연결해 주는 Instance 들어가는 "상자"라고 이해하면 쉽습니다.
+
+이 상자는 Component가 연결해 주는 Instance의 주입 시작점 입니다.
 
 이 상자는 생명 주기에 맟춘 상자 입니다.
-
-이 상자에 들어가는 Component들은 상자(Container)로 정의한 Android의 생명주기 클래스들(Activity, Fragment, Application)에 맞춰 인스턴스가 생성(onAttach 때)되고 파괴(onDestroy 때) 됩니다.
 
 Container의 생명 주기를 클래스에 맞춰 Container를 생성하는 방법은
 
@@ -57,18 +59,24 @@ class LogsFragment : Fragment() {
 
 <br/>
 
-Component는 Container에 들어가는 요소입니다. Container에 들어가는, Dependency Injection을 할 Instance라고 봐도 무방합니다.
+Component는 Container에 들어갈 Module, Instance를 연결해 주는, 주된 역할을 수행합니다.
 
-콘크리트 클래스는 밑에서 설명할 @Indect 어노테이션을 사용하면 자동으로 Container의 생명 주기에 맞춰 들어가고,
+콘크리트 클래스는 밑에서 설명할 @Indect 어노테이션을 사용하면 자동으로 Container의 EntryPoint에 들어가고,
 
-콘크리트 클래스가 아닌 Interface나 Instance를 프로젝트 내에 가지고 있지 않고 build() 패턴을 사용하는
+콘크리트 클래스가 아닌 Interface나
 
-Room, Retrofit 같은 경우는 @InstallIn() 어노테이션을 사용하여, 어느 생명주기에 맞춘 Container에 들어갈 component인지 명시합니다.
+Instance를 프로젝트 내에 가지고 있지 않고 build() 패턴을 사용하는
+
+Room, Retrofit 같은 경우는 @InstallIn() 어노테이션을 사용하여, 어느 생명주기에 맞춘 Container에 들어갈 Instance 인지 명시합니다.
+
+**(! 주의! 어느 컨테이너에 들어갈지를 결정하지, 컨테이너가 지정된 안드로이드 class(Activity, Fragment, View)의 생명 주기를 따르는 것은 아닙니다. 즉, 그저 AndroidEntryPoint에 인스턴스를 생성해서 주입만 합니다.)**
+
+**(생명 주기를 따라 Instance가 유지되는 어노테이션은 밑에서 알아볼 한정자 입니다.)**
 
 예시:
 
 ```kotlin
-//Activity Container에 들어갈 Activity Component 라고 명시하는 방법.
+//Activity Container에 들어갈(AndroidEntryPoint에 들어갈) Instance 라고 명시하는 방법.
 @InstallIn(ActivityComponent::class)
 @Module
 
@@ -103,6 +111,17 @@ class LogsFragment : Fragment() {
 <br/>
 <br/>
 
+### @EntryPoint
+
+<br/>
+
+생명주기가 없는 일반 Container를 생성합니다.
+
+생명 주기가 없는 일반 class에 Inject할 때 사용합니다.
+
+<br/>
+<br/>
+
 ### @Inject
 
 <br/>
@@ -118,7 +137,7 @@ Fragment 나 Activity 등, 생명주기를 가지고 있는 클래스의 Feild�
 class LogsFragment : Fragment() {
 
     /**
-     * 생명 주기에 맞게 생성되고 소멸되는 Instance를 주입해 준다.
+     * Instance를 찾아 주입한다.
      */
 
     //Instance 주입은 onAttach 에서 하게 된다.
@@ -189,13 +208,13 @@ Retrofit이나 Room과 같이 프로젝트에 실제 객체를 가지지 못하�
 
 만약 SingletonComponent를 넣는다면
 
-App 전체 container 에 담겨 App의 생명 주기(App이 끝날때 소멸)를 따를 것이고
+App 전체 container 에 담길 것이고
 
 </br>
 
 만약 FragmentComponent를 넣는다면
 
-Inject를 한 Fragment 의 container 에 담겨 Fragment의 생명 주기를 따라 생성되고 소멸 될 것 입니다.
+Inject를 한 Fragment 의 container 에 담길 것 입니다.
 
 ```kotlin
 @InstallIn(SingletonComponent::class)
@@ -235,10 +254,10 @@ https://github.com/Moony-H/Dagger-Hilt-Study-Example/blob/master/app/src/main/ja
  *  어느 container 에 담기는 component 인지를 명시하는 어노테이션이다.
  *
  *  만약 SingletonComponent를 넣는다면
- *  App 전체 container 에 담겨 App의 생명 주기(App이 끝날때 소멸)를 따를 것이고
+ *  App 전체 container 에 담길 것 이고
  *
  *  만약 FragmentComponent를 넣는다면
- *  Inject를 한 Fragment 의 container 에 담겨 Fragment의 생명 주기를 따라 생성되고 소멸 될 것이다.
+ *  Inject를 한 Fragment 의 container 에 담길 것 이다.
  *
  *  @Module:
  *  Hilt에 "결합 방법"을 추가하는 어노테이션이다.
