@@ -70,7 +70,7 @@ Room, Retrofit 같은 경우는 @InstallIn() 어노테이션을 사용하여, �
 
 **(! 주의! 어느 컨테이너에 들어갈지를 결정하지, 컨테이너가 지정된 안드로이드 class(Activity, Fragment, View)의 생명 주기를 따르는 것은 아닙니다. 즉, 그저 AndroidEntryPoint에 인스턴스를 생성해서 주입만 합니다.)**
 
-**(생명 주기를 따라 Instance가 유지되는 어노테이션은 밑에서 알아볼 한정자 입니다.)**
+**(생명 주기를 따라 Instance가 유지되는 어노테이션은 밑에서 알아볼 Scope입니다.)**
 
 예시:
 
@@ -372,6 +372,168 @@ Hilt는 생명주기를 맞춰 인스턴스를 관리할 수 있는 여러 어�
 ![화면 캡처 2022-03-23 004312](https://user-images.githubusercontent.com/53536205/159522040-e390757a-b6e0-4f81-b6f9-bb8b4ec6eb4c.png)
 
 만약 위와 같은 오류가 발생한 다면, 계층 구조를 의심해 봅시다.
+
+<br/>
+
+<br/>
+
+### @Qualifier
+
+@Qualifier는 한정자 주석 입니다. 어노테이션을 만듭니다.
+
+이 어노테이션을 설명하기 위해 하나의 상황을 가정합니다.
+
+### _**"추상화를 통하여 하나의 타입으로 서로 다른 Instance를 주입하고자 한다."**_
+
+만약 data를 메모리, 또는 Database에 저장한다고 합시다.
+
+그렇다면 data를 저장하는 공통된 함수를 interface로 묶을 수 있습니다.
+
+```kotlin
+interface LoggerDataSource {
+    fun addLog(msg: String)
+    fun getAllLogs(callback: (List<Log>) -> Unit)
+    fun removeLogs()
+}
+```
+
+<br/>
+
+<br/>
+
+그리고 메모리에 저장하는 클래스, Database에 저장하는 클래스 모두 이 interface를 implement 합니다.
+
+```kotlin
+class LoggerLocalDataSource @Inject constructor(
+    private val logDao: LogDao
+    override fun addLog(msg: String) {
+    }
+    
+    /**
+    중략
+    */
+) : LoggerDataSource //interface를 상속한다.
+```
+
+```kotlin
+class LoggerInMemoryDataSource @Inject constructor(): LoggerDataSource {
+
+    private val logs = LinkedList<Log>()
+
+    override fun addLog(msg: String) {
+        
+    }
+
+    /**
+    중략
+    */
+}:LoggerDataSource //interface를 상속한다.
+```
+
+<br/>
+
+<br/>
+
+그리고 위의 Interface를 주입할 Fragment에 Interface 타입으로 Inject를 수행합니다.
+
+```kotlin
+@AndroidEntryPoint
+class ButtonsFragment : Fragment() {
+
+    @Inject
+    lateinit var logger: LoggerDataSource
+}
+```
+
+<br/>
+
+<br/>
+
+그 다음 두 클래스 모두 Interface 타입으로 사용하기 위해, 위에서 배운 @Binds로 명시해 줍니다.
+
+```kotlin
+
+@InstallIn(ApplicationComponent::class)
+@Module
+abstract class LoggingDatabaseModule {
+
+
+    @Singleton
+    @Binds
+    abstract fun bindDatabaseLogger(impl: LoggerLocalDataSource): LoggerDataSource
+}
+
+@InstallIn(ActivityComponent::class)
+@Module
+abstract class LoggingInMemoryModule {
+
+    @ActivityScoped
+    @Binds
+    abstract fun bindInMemoryLogger(impl: LoggerInMemoryDataSource): LoggerDataSource
+}
+```
+
+<br/>
+
+<br/>
+
+문제는 여기서 발생합니다. Fragment에 Inject한 타입은 Interface 타입입니다. 그리고 그 Interface는 Binds로 정의된 @Module이 두 개나 존재합니다.
+
+따라서 Hilt는 두 가지의 Binds 된 abstract 함수 중 어느 것을 실행하여 @Inject를 수행할 것인지 알지 못합니다.
+
+우리는 이 때에 @Qualifier 를 이용하여 새로운 어노테이션을 만든 후, 이 것을 알려 줄 수 있습니다.
+
+```kotlin
+@Qualifier
+annotation class InMemoryLogger //새로운 어노테이션 생성
+
+@Qualifier
+annotation class DatabaseLogger //새로운 어노테이션 생성
+
+@InstallIn(ApplicationComponent::class)
+@Module
+abstract class LoggingDatabaseModule {
+
+    @DatabaseLogger //만약 @Inject와 이 어노테이션이 함께 사용된다면, 이 Binds를 사용해야 한다.
+    			   //라고 Hilt에게 알린다.
+    @Singleton
+    @Binds
+    abstract fun bindDatabaseLogger(impl: LoggerLocalDataSource): LoggerDataSource
+}
+
+@InstallIn(ActivityComponent::class)
+@Module
+abstract class LoggingInMemoryModule {
+
+    @InMemoryLogger //만약 @Inject와 이 어노테이션이 함께 사용된다면, 이 Binds를 사용해야 한다.
+    			   //라고 Hilt에게 알린다.
+    @ActivityScoped
+    @Binds
+    abstract fun bindInMemoryLogger(impl: LoggerInMemoryDataSource): LoggerDataSource
+}
+```
+
+<br/>
+
+이제 Fragment에서 @Inject를 수행할 때에 @Inject와 같이 어느 Instance를 주입할 것인지 명시하면 됩니다.
+
+```kotlin
+@AndroidEntryPoint
+class ButtonsFragment : Fragment() {
+
+    @DatabaseLogger //이 @Inject의 타입은 Interface이고, 이 Interface를 사용한 Binds는 두 가지이다.
+    			   // 따라서 DatabaseLogger 이라고 명시된 Binds의 Module을 사용하라.
+    @Inject
+    lateinit var logger: LoggerDataSource
+    @Inject
+    lateinit var navigator: AppNavigator
+```
+
+<br/>
+
+<br/>
+
+모든 설명을 마쳤습니다. 감사합니다.
 
 
 
