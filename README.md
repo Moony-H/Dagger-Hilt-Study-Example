@@ -1,4 +1,3 @@
-
 <br/>
 
 # DI 라이브러리 Hilt 사용법 및 학습
@@ -341,6 +340,40 @@ abstract class NavigationModule {
 <br/>
 <br/>
 <br/>
+
+### Scoped
+
+Hilt는 생명주기를 맞춰 인스턴스를 관리할 수 있는 여러 어노테이션을 제공합니다.
+
+이 어노테이션들은 Instance가 어떤 생명 주기에 맞춰 생성되고 파괴되는 지를 명시하는 어노테이션 입니다.
+
+또한 상위 어노테이션으로 명시된 class는 그 하위 AndroidEntryPoint 에도 Inject 할 수 있습니다.
+
+![화면 캡처 2022-03-23 003126](https://user-images.githubusercontent.com/53536205/159519198-bc8ea419-7000-482d-bc9a-5ab84e60aef8.png)
+
+<br/>
+
+예시)
+
+@ActivityScoped는 AndroidEntryPoint가 명시된 Activity class의 생명 주기에 맞춰 생성되고 파괴 됩니다.
+
+또한 위의 그림에서와 같이 ActivityScoped의 하위 구성 요소인 Fragment와 View 에도 @Inject를 수행할 수 있으며,
+
+이 때, Inject된 인스턴스는 ActivityScoped를 따르니, Fragment와 View에 들어간 객체는 Activity에 들어간 객체와 동일한 Instance가 됩니다.(Activity가 끝나지 않는 한 Instance는 파괴되지 않는다.)
+
+<br/>
+
+만약 @ActivityScoped로 설정된 객체가 두개의 서로다른 Activity로 @Inject 될 경우, 두 개의 Instance는 다른 Instance가 됩니다.
+
+두 Activity에 같은 인스턴스를 넣고 싶다면 그 상위 구성 요소(Component)인 @ActivityRetainedScoped나 @Singleton으로 명시해야 합니다.
+
+만약 맞는 Scope도, 상위 Scope도 아닌 하위 Scope로 상위 Component에 @Inject를 수행할 경우 아래와 같은 오류가 나타납니다.
+
+![화면 캡처 2022-03-23 004312](https://user-images.githubusercontent.com/53536205/159522040-e390757a-b6e0-4f81-b6f9-bb8b4ec6eb4c.png)
+
+만약 위와 같은 오류가 발생한 다면, 계층 구조를 의심해 봅시다.
+
+
 
 앱 실행 화면:  
 
