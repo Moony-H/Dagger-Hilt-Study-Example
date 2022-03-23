@@ -226,7 +226,7 @@ object DatabaseModule {
 <br/>
 <br/>
 
-### @Providers
+### @Provides
 
 <br/>
 
@@ -234,9 +234,9 @@ object DatabaseModule {
 
 @InstallIn, @Module과 쌍으로 같이 다니는 어노테이션입니다.
 
-@Providers는 함수에게 사용합니다.
+@Provides는 함수에게 사용합니다.
 
-@Providers는 @Module을 사용한 클래스의 Instance가 생성될 때 호출되는 함수가 됩니다.
+@Provides는 @Module을 사용한 클래스의 Instance가 생성될 때 호출되는 함수가 됩니다.
 
 생성자가 된다라고 봐도 무방(?)합니다.
 
@@ -264,7 +264,7 @@ https://github.com/Moony-H/Dagger-Hilt-Study-Example/blob/master/app/src/main/ja
  *  Module 어노테이션을 사용하여 방법을 따로 지정할 수 있다.
  *  만약 "Interface에 대고 프로그래밍하기" 나 "class를 추상화" 하여서 Instance를 직접 제공할 수 없다면 사용할 수 있는 방식이다.
  *
- *  @Providers:
+ *  @Provides:
  *  Instance를 제공하는 방법을 직접적으로 알려줄 수 있는 어노테이션이다.
  *  providers 어노테이션 밑에 함수를 작성하여, 이 클래스에 Inject가 발생할 때 마다 실행할 함수를 Hilt에 알린다.
  *
