@@ -28,13 +28,13 @@
 
 <br/>
 
-container는 Component가 연결해 주는 Instance 들어가는 "상자"라고 이해하면 쉽습니다.
+container는 의존성 "상자"라고 이해하면 쉽습니다.
 
 이 상자는 Component가 연결해 주는 Instance의 주입 시작점 입니다.
 
 이 상자는 생명 주기에 맟춘 상자 입니다.
 
-Container의 생명 주기를 클래스에 맞춰 Container를 생성하는 방법은
+각 의존성들을 가지고 생명주기를 고려하여 의존성 주입을 하는 기능을 가집니다.
 
 **@AndroidEntryPoint 어노테이션을 생명주기를 가진 클래스 위에 사용합니다.**
 
@@ -60,13 +60,11 @@ class LogsFragment : Fragment() {
 
 Component는 Container에 들어갈 Module, Instance를 연결해 주는, 주된 역할을 수행합니다.
 
-콘크리트 클래스는 밑에서 설명할 @Indect 어노테이션을 사용하면 자동으로 Container의 EntryPoint에 들어가고,
-
 콘크리트 클래스가 아닌 Interface나
 
 Instance를 프로젝트 내에 가지고 있지 않고 build() 패턴을 사용하는
 
-Room, Retrofit 같은 경우는 @InstallIn() 어노테이션을 사용하여, 어느 생명주기에 맞춘 Container에 들어갈 Instance 인지 명시합니다.
+Room, Retrofit 같은 경우는 @InstallIn() 어노테이션을 사용하여, 표준 컴포넌트 중 어느 Component 인지 명시합니다.
 
 **(! 주의! 어느 컨테이너에 들어갈지를 결정하지, 컨테이너가 지정된 안드로이드 class(Activity, Fragment, View)의 생명 주기를 따르는 것은 아닙니다. 즉, 그저 AndroidEntryPoint에 인스턴스를 생성해서 주입만 합니다.)**
 
@@ -75,7 +73,7 @@ Room, Retrofit 같은 경우는 @InstallIn() 어노테이션을 사용하여, �
 예시:
 
 ```kotlin
-//Activity Container에 들어갈(AndroidEntryPoint에 들어갈) Instance 라고 명시하는 방법.
+//표준 컴포넌트 중, ActivityComponent에 Module을 설치할 것이라고 명시하는 방법.
 @InstallIn(ActivityComponent::class)
 @Module
 
