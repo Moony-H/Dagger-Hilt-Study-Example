@@ -169,7 +169,7 @@ class DateFormatter @Inject constructor() {
 
 이렇게 둘 모두 @Inject 어노테이션을 사용해야 Dependency Injection이 실행 됩니다.
 
-주의할 점은, @Indect를 사용하는 Field는 **무조건 public**이어야 하며,
+주의할 점은, @Indect를 사용하는 Field는 **무조건 public과 lateinit var**이어야 하며(필드 주입이기 때문 입니다.),
 
 실제 인스턴스가 생성되어 Injection 하는 시점은 onAttach 입니다.
 
