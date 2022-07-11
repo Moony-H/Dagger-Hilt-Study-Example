@@ -28,9 +28,9 @@
 
 <br/>
 
-container는 의존성 "상자"라고 이해하면 쉽습니다.
 
-이 상자는 Component가 연결해 주는 Instance의 주입 시작점 입니다.
+
+container는 Component가 연결해 주는 Instance의 주입 시작점 입니다.
 
 이 상자는 생명 주기에 맟춘 상자 입니다.
 
