@@ -8,7 +8,7 @@
 
 학습 내용과 어노테이션 설명은 모두 코드에 주석으로 달아 놓았습니다. 따라서 코드를 보고 이해해도 무방합니다.
 
-이 Repository는 구글 Android의 공식 페이지 https://developer.android.com/codelabs/ 에서 학습한 내용을 담고 있습니다.
+이 Repository는 구글 Android의 [공식 페이지](https://developer.android.com/codelabs/) 에서 학습한 내용을 담고 있습니다.
 
 학습 구성과 흐름은 https://developer.android.com/codelabs/android-hilt#0 에서 확인하실 수 있습니다.
 
