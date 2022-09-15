@@ -58,7 +58,17 @@ class LogsFragment : Fragment() {
 
 <br/>
 
-Component는 Container에 들어갈 Module, Instance를 연결해 주는, 주된 역할을 수행합니다.
+Component는 Instance를 주입해 주는, 주된 역할을 수행합니다.
+
+Dagger에서는 인스턴스 주입 방법이 정의된 Module이 결합되는 장소 입니다.
+
+이는 @Component 어노테이션을 사용한 interface를 정의하면
+
+Dagger는 내부적으로 이 Interface를 상속한 클래스를 만들고,
+
+Binding에 정의된 방법에 따라 Instance를 생성하여 주입해 주는 메소드를 생성합니다.
+
+<br/>
 
 콘크리트 클래스가 아닌 Interface나
 
